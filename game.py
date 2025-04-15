@@ -3,6 +3,7 @@ class Player:
     def __init__(self, name):
         self.name = name
         self.inventory = []
+        self.health = 100
         self.has_map = False
         self.has_lantern = False
         self.has_treasure = False
@@ -16,6 +17,20 @@ class Player:
     def show_inventory(self):
         print(f"Inventory: {', '.join(self.inventory) if self.inventory else 'Empty'}")
 
+    def lose_health(self, amount):
+        self.health -= amount
+        print(f"Your health is now {self.health}.")
+        self.check_health()
+
+    def check_health(self):
+        if self.health <= 0:
+            print(f"{self.name}, you have died. Game Over.")
+            exit()
+
+    def check_win(self):
+        if self.has_treasure and self.has_rare_herbs:
+            print(f"{self.name}, you have collected both treasure and rare herbs! You win!")
+            exit()
 
 # Function to welcome the player
 def welcome_player():
@@ -25,7 +40,6 @@ def welcome_player():
     print(f"Welcome, {player.name}! Your journey begins now.")
     return player
 
-
 # Function to describe the starting area
 def describe_area():
     print("""
@@ -33,7 +47,6 @@ You find yourself in a dark forest.
 The sound of rustling leaves fills the air.
 A faint path lies ahead, leading deeper into the unknown...
 """)
-
 
 # Function to show the main menu
 def show_main_menu():
@@ -45,7 +58,6 @@ def show_main_menu():
     5. Stay where you are
     6. View inventory
     """)
-
 
 # Function to handle player choices
 def handle_choice(choice, player):
@@ -64,26 +76,25 @@ def handle_choice(choice, player):
     else:
         print("Invalid choice, please select a valid option.")
 
-
 # Function for exploring the dark woods
 def explore_dark_woods(player):
     print(f"{player.name}, you step into the dark woods...")
     if not player.has_lantern:
         print("It's too dark to continue without a lantern.")
+        player.lose_health(10)
     else:
         player.add_to_inventory("lantern")
         player.has_lantern = True
-
 
 # Function for exploring the mountain pass
 def explore_mountain_pass(player):
     print(f"{player.name}, you head toward the mountain pass.")
     if not player.has_map:
         print("You can't find your way without a map.")
+        player.lose_health(10)
     else:
         player.add_to_inventory("map")
         player.has_map = True
-
 
 # Function for exploring the cave
 def explore_cave(player):
@@ -93,7 +104,7 @@ def explore_cave(player):
         player.has_treasure = True
     else:
         print("It's too dark to continue without a lantern.")
-
+        player.lose_health(10)
 
 # Function for exploring the hidden valley
 def explore_hidden_valley(player):
@@ -103,12 +114,12 @@ def explore_hidden_valley(player):
         player.has_rare_herbs = True
     else:
         print("You can't find the valley without a map.")
-
+        player.lose_health(10)
 
 # Function for staying still (no progress)
 def stay_still(player):
     print(f"{player.name}, you decide to stay where you are.")
-
+    player.lose_health(10)
 
 # Main game loop
 def main():
@@ -119,7 +130,7 @@ def main():
         show_main_menu()
         choice = input("Choose an action (1-6): ").strip()
         handle_choice(choice, player)
-
+        player.check_win()
 
 # Run the game
 if __name__ == "__main__":
